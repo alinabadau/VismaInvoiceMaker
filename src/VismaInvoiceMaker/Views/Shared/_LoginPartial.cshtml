@@ -1,0 +1,37 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using VismaInvoiceMaker.Models
+
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <form asp-controller="Account" asp-action="LogOff" method="post" id="logoutForm" class="navbar-right margin-top">
+        <ul class="nav navbar-nav navbar-right">
+            <li>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    My account
+                    <b class="caret"></b>
+                </a>
+
+                <ul class="dropdown-menu">
+                    <li><a asp-controller="Manage" asp-action="Index">Profile</a></li>
+                    <li><a href="#">Billing Info</a></li>
+                    <li><a href="#">Change Language</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#">Feedback</a></li>
+                </ul>
+            </li>
+            <li>
+                <button type="submit" class="btn btn-link navbar-btn navbar-link">Sign out</button>
+            </li>
+        </ul>
+    </form>
+}
+else
+{
+    <ul class="nav navbar-nav navbar-right">
+        <li><a asp-area="" asp-controller="Account" asp-action="Register">Register</a></li>
+        <li><a asp-area="" asp-controller="Account" asp-action="Login">Log in</a></li>
+    </ul>
+}

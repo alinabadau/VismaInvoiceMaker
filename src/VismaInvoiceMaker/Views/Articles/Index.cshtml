@@ -1,0 +1,61 @@
+@using System.Threading.Tasks
+@using Kendo.Mvc.UI
+@model IEnumerable<Article>
+
+@{
+    ViewData["Title"] = "Supplies";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<ul class="breadcrumb">
+    <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+    <li class="active">My Supplies</li>
+</ul>
+
+<p>
+    @(Html.ActionLink("Add New", "Create", "Supplies", htmlAttributes: new { @class = "k-primary k-button btn btn-primary" }))
+</p>
+
+@(Html.Kendo().Grid<Article>()
+              .Name("gridArticles")
+              .Columns(columns =>
+              {
+                  columns.Bound(c => c.Name).Title("Name").Filterable(c => c.CheckAll(true).Multi(true));
+                  columns.Bound(c => c.Notes).Title("Notes").Filterable(false);
+                  columns.Bound(c => c.Price).Width(100).Format("{0:n2}").Title("Price").Filterable(false);
+                  columns.Template("NOK").Title("Currency").Width(50);
+                  columns.Bound(c => c.VAT).Width(80).Format("{0:n0}").Title("VAT").Filterable(false);
+                  columns.Command(command =>
+                  {
+                      command.Custom("editItem").Text("Edit").Click("function(e){ actionOnRowItem(e, '#gridArticles', 'ArticleId', '" + Url.Action("Edit", "Articles") + "');}");
+                      command.Custom("viewItem").Text("Details").Click("function(e){ actionOnRowItem(e, '#gridArticles', 'ArticleId', '" + Url.Action("Details", "Articles") + "');}");
+                      command.Custom("deleteItem").Text("Delete").Click("function(e){ actionOnRowItem(e, '#gridArticles', 'ArticleId', '" + Url.Action("Delete", "Articles") + "');}");
+                  }).Title("Actions").Width(250);
+              })
+              .Resizable(c => c.Columns(true))
+              .Selectable(s => s.Enabled(true).Mode(GridSelectionMode.Single))
+              .Sortable(true)
+              .Filterable(f => f.Enabled(true).Mode(GridFilterMode.Menu))
+              .Groupable(false)
+              .Pageable(p => p.Enabled(true).PageSizes(true))
+              .Events(e => e.DataBound("onDataBoundGridTemplate"))
+              .BindTo(Model.ToList())
+              .DataSource(dataSource => dataSource
+              .Ajax()
+              .PageSize(10)
+              .Batch(true)
+              .ServerOperation(false)
+              .Events(events => events.Error("error_handler"))
+              .Model(model =>
+              {
+                  model.Id(p => p.ArticleId);
+                  model.Field(f => f.Name);
+                  model.Field(f => f.Price);
+                  model.Field(f => f.VAT);
+                  model.Field(f => f.Notes);
+              }))
+)
+
+<script>
+    $("#menu").find("li").removeClass("k-state-selected");
+    $("#ArticleMenuLink").addClass("k-state-selected");
+</script>

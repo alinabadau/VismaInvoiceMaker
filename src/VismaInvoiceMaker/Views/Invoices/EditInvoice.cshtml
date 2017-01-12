@@ -1,0 +1,319 @@
+@using Kendo.Mvc.UI
+@model Invoice
+@{
+    ViewData["Title"] = Model.InvoiceId.Equals(Guid.Empty) ? "New Invoice" : "Edit Invoice";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<ul class="breadcrumb">
+    <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+    <li><a asp-controller="Home" asp-action="Index">My Invoices</a></li>
+    <li class="active">@(Model.InvoiceId.Equals(Guid.Empty) ? "New Invoice" : "Edit Invoice")</li>
+</ul>
+
+<div class="white-panel margin-top">
+
+
+    @(Html.Kendo().Button()
+    .Name("PrintBtn")
+    .HtmlAttributes(new { type = "button", @class = "right-align k-primary", @id = "PrintBtn" })
+    .Enable(Model.InvoiceId != Guid.Empty)
+    .Content("Preview")
+    .Events(e => e
+        .Click("printInvoice")))
+
+    <div class="dropdown">
+        <a href="#" class="dropdown-toggle k-button right-align  margin-right" data-toggle="dropdown">
+            <i class="fa fa-exclamation small-margin-right"></i>Info
+            <b class="caret"></b>
+        </a>
+
+        <div class="dropdown-menu right-align  margin-right" style="right: 0px; padding-left: 15px;">
+            <div class="box-col">
+
+                <h4>Actions applied on Grid data table</h4>
+                <ul class="keyboard-legend">
+                    <li>
+                        <span class="button-preview">
+                            <span class="key-button leftAlign">Alt</span>
+                            +
+                            <span class="key-button">A</span>
+                        </span>
+                        <span class="button-descr">
+                            add new empty row at the end
+                        </span>
+                    </li>
+
+                    <li>
+                        <span class="button-preview">
+                            <span class="key-button leftAlign">Alt</span>
+                            +
+                            <span class="key-button">Q</span>
+                        </span>
+                        <span class="button-descr">
+                            deletes current focused row
+                        </span>
+                    </li>
+                    <li>
+                        <span class="button-preview">
+                            <span class="key-button">Esc</span>
+                        </span>
+                        <span class="button-descr">
+                            closes the filtering or editing mode
+                        </span>
+                    </li>
+                    <li>
+                        <span class="button-preview">
+                            <span class="key-button">Tab</span>
+                        </span>
+                        <span class="button-descr">
+                            navigates through the cells
+                        </span>
+                    </li>
+                    <li>
+                        <span class="button-preview">
+                            <span class="key-button leftAlign">Shift</span>
+                            +
+                            <span class="key-button">Tab</span>
+                        </span>
+                        <span class="button-descr">
+                            same as Tab, but in reverse order
+                        </span>
+                    </li>
+                    <li>
+                        <span class="button-preview">
+                            <span class="key-button wider">Arrow Keys</span>
+                        </span>
+                        <span class="button-descr">
+                            to navigate over the cells
+                        </span>
+                    </li>
+                </ul>
+            </div>
+            <div class="box-col">
+                <h4>Focus</h4>
+                <ul class="keyboard-legend" style="margin-bottom: 1em;">
+                    <li>
+                        <span class="button-preview">
+                            <span class="key-button leftAlign">Alt</span>
+                            +
+                            <span class="key-button">w</span>
+                        </span>
+                        <span class="button-descr">
+                            focuses the widget
+                        </span>
+                    </li>
+                </ul>
+                <h4>Actions applied on current page</h4>
+                <ul class="keyboard-legend">
+                    <li>
+                        <span class="button-preview">
+                            <span class="key-button leftAlign">Ctrl</span>
+                            +
+                            <span class="key-button">S</span>
+                        </span>
+                        <span class="button-descr">
+                            saves current invoice
+                        </span>
+                    </li>
+                    <li>
+                        <span class="button-preview">
+                            <span class="key-button leftAlign">Ctrl</span>
+                            +
+                            <span class="key-button">U</span>
+                        </span>
+                        <span class="button-descr">
+                            saves current invoice and loads new empty template
+                        </span>
+                    </li>
+                    <li>
+                        <span class="button-preview">
+                            <span class="key-button leftAlign">Ctrl</span>
+                            +
+                            <span class="key-button">Q</span>
+                        </span>
+                        <span class="button-descr">
+                            cancel changes and get back to list
+                        </span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="invoice-header margin-top">
+        @Html.HiddenFor(m => m.InvoiceId, new { id = "invoiceId" })
+        <div class="form-horizontal form-widgets col-sm-4">
+            <div class="form-group">
+                <label class="control-label col-sm-6">@Html.LabelFor(m => m.InvoiceNumber)</label>
+                <div class="col-sm-8 col-md-6 small-margin-top" id="InvoiceNumber">@Html.DisplayFor(m => m.InvoiceNumber)</div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-6">Invoice Date</label>
+                <div class="col-sm-8 col-md-6">
+                    @(Html.Kendo().DatePickerFor(m => m.TimeStamp).Value(DateTime.Now.Date))
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-6">Due Date</label>
+                <div class="col-sm-8 col-md-6">
+                    @(Html.Kendo().DatePickerFor(m => m.DueDate).Value(DateTime.Now.Date))
+                </div>
+            </div>
+        </div>
+        <div class="form-horizontal form-widgets col-sm-4">
+            <div class="form-group">
+                <label class="control-label col-sm-6">Customer</label>
+                <div class="col-sm-8 col-md-6">
+                    @(Html.Kendo().DropDownListFor(m => m.Customer)
+                          .Value((Model.Customer?.CustomerId ?? Guid.Empty).ToString())
+                          .DataTextField("Name")
+                          .DataValueField("CustomerId")
+                          .OptionLabel("Select customer...")
+                          .Filter(FilterType.Contains)
+                          .HtmlAttributes(new { style = "width: 175px;" })
+                          .Height(400)
+                          .DataSource(source => source
+                              .Ajax()
+                              .Read("GetCustomers", "Customers")))
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-6">Store</label>
+                <div class="col-sm-8 col-md-6">
+                    @(Html.Kendo().DropDownListFor(m => m.Store)
+                          .Value((Model.Store?.StoreId ?? Guid.Empty).ToString())
+                          .DataTextField("Name")
+                          .DataValueField("StoreId")
+                          .OptionLabel("Select store...")
+                          .Filter(FilterType.Contains)
+                          .HtmlAttributes(new { style = "width: 175px;" })
+                          .Height(400)
+                          .DataSource(source => source
+                              .Ajax()
+                              .Read("GetStores", "Stores")))
+                </div>
+
+            </div>
+
+            <div class="form-group">
+                <label class="control-label col-sm-6">@(Html.LabelFor(m => m.AdvancePaymentTax))</label>
+                <div class="col-sm-8 col-md-6">
+                    @(Html.Kendo().NumericTextBoxFor(m => m.AdvancePaymentTax).Events(e => e.Change("onChangeAdvancePayment")))
+                </div>
+
+            </div>
+        </div>
+        <div class="form-horizontal form-widgets col-sm-4 right-align">
+            <div class="form-group">
+                <label class="control-label col-sm-6">@Html.LabelFor(m => m.VATAmount)</label>
+                <div class="col-sm-8 col-md-5">
+                    <div id="VATAmount" class="small-margin-top bold right-align">
+                        @(Html.DisplayFor(m => m.VATAmount)) NOK
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-6">@Html.LabelFor(m => m.TotalWithVAT)</label>
+                <div class="col-sm-8 col-md-5">
+                    <div id="TotalWithVAT" class="small-margin-top bold right-align">
+                        @(Html.DisplayFor(m => m.TotalWithVAT)) NOK
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-sm-6">@Html.LabelFor(m => m.TotalToPay)</label>
+                <div class="col-sm-8 col-md-5">
+                    <div id="TotalToPay" class="small-margin-top bold right-align">
+                        @(Html.DisplayFor(m => m.TotalToPay)) NOK
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="invoice-content">
+
+        @(Html.Kendo().Grid<InvoiceDetails>()
+              .Name("grid")
+              .Columns(columns =>
+              {
+                  columns.Bound(c => c.Article).ClientTemplate("#:data.Article==null?'':data.Article.Name#").HtmlAttributes(new { @class = "editable-cell" });
+                  columns.Bound(c => c.Qty).Width(75).HtmlAttributes(new { @class = "editable-cell" });
+                  columns.Bound(c => c.VAT).Width(75).ClientTemplate("#:data.VAT#").HtmlAttributes(new { @class = "editable-cell" });
+                  columns.Bound(c => c.Price).Width(100).ClientTemplate("#:data.Price > 0? data.Price: (data.Article == null? 0: data.Article.Price)#").HtmlAttributes(new { @class = "editable-cell" });
+                  columns.Template("NOK").Locked(true).Title("Currency").Width(50);
+                  columns.Bound(c => c.VatAmount).Width(45).Format("{0:n2}").Title("VAT Amount");
+                  columns.Bound(c => c.TotalPlusVat).Width(50).Format("{0:n2}").Title("Total");
+                  columns.Command(command => { command.Destroy(); }).Width(150);
+              })
+              .ToolBar(t =>
+              {
+                  t.Create().Text("Add new article");
+                  // t.Save();
+              })
+              .Editable(e => e.Mode(GridEditMode.InCell).CreateAt(GridInsertRowPosition.Bottom).DisplayDeleteConfirmation(false))
+              .Navigatable(true)
+              .Resizable(c => c.Columns(true))
+              .Events(e => e.Edit("onEditGrid").DataBound("onDataBoundEditInvoice"))
+              .BindTo(Model.InvoiceDetails.ToList().Select(s => new InvoiceDetails()
+              {
+                  InvoiceDetailsId = s.InvoiceDetailsId,
+                  Article = s.Article,
+                  Price = s.Price,
+                  Qty = s.Qty,
+                  VAT = s.VAT,
+                  VatAmount = s.VatAmount,
+                  TotalPlusVat = s.TotalPlusVat
+              }).ToArray())
+              .DataSource(dataSource => dataSource
+              .Ajax()
+              .Batch(true)
+              .ServerOperation(false)
+              .Events(events => events.Error("error_handler"))
+              .Model(model =>
+              {
+                  model.Id(p => p.InvoiceDetailsId);
+                  model.Field(f => f.Article);
+                  model.Field(f => f.Price);
+                  model.Field(f => f.Qty);
+                  model.Field(f => f.VAT).Editable(false);
+                  model.Field(f => f.VatAmount).Editable(false);
+                  model.Field(f => f.TotalPlusVat).Editable(false);
+              }))
+        )
+
+    </div>
+</div>
+<div class="invoice-footer margin-top">
+
+    @(Html.Kendo().Button()
+    .Name("CancelBtn")
+    .HtmlAttributes(new { type = "button", @class = "right-align", @id = "CancelBtn" })
+    .Content("Cancel")
+    .Events(e => e
+        .Click("cancelInvoice")))
+
+    @(Html.Kendo().Button()
+    .Name("SaveBtn")
+    .HtmlAttributes(new { type = "button", @class = "k-primary right-align margin-right", @id = "SaveBtn" })
+    .Content("Save")
+    .Events(e => e
+        .Click("saveInvoice")))
+
+    @(Html.Kendo().Button()
+    .Name("SaveAndNewBtn")
+    .HtmlAttributes(new { type = "button", @class = "k-primary right-align margin-right", @id = "SaveAndNewBtn" })
+    .Content("Save & New")
+    .Events(e => e
+        .Click("saveAndNewInvoice")))
+</div>
+
+<script>
+    $("#InvoicesMenuLink").addClass("k-state-selected");
+    $(document).ready(function () {
+        if ("@Model.InvoiceId.Equals(Guid.Empty)" === "False")
+            $(".k-button.k-button-icontext.k-grid-add").focus();
+        else
+            $("#TimeStamp").focus();
+    });
+</script>

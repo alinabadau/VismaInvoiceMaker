@@ -1,0 +1,167 @@
+﻿@model Invoice
+@{
+    ViewBag.Title = DateTime.Now.Year + "#" + Model.InvoiceNumber + " " + Model.Customer.Name;
+    Layout = "~/Views/Shared/_LayoutPrint.cshtml";
+}
+
+<table class="invoiceHeader">
+    <tr>
+        <td>
+            <img src="@Url.Content("~/images/logo.png")" style="float:left;" />
+        </td>
+        <td style="text-align:right">
+            <h2>@string.Format("Invoice number #{0}/{1}", @Model.InvoiceNumber, DateTime.Now.Year)</h2>
+            @string.Format("{0:d}", Model.TimeStamp)
+        </td>
+    </tr>
+</table>
+<div class="from">
+    <blockquote>
+        <p>
+            <strong>
+                @ViewBag.MyCompany
+            </strong>
+        </p>
+        <p>
+
+            Company Number: <strong>@ViewBag.MyCompanyID</strong>
+        </p>
+        <p>
+            @Html.Raw(ViewBag.MyCompanyAddress.Replace(";", "<br/>"))
+        </p>
+        <hr />
+        <p>
+            Phone: @ViewBag.MyCompanyPhone
+        </p>
+        <p>
+            @ViewBag.MyEmail
+        </p>
+    </blockquote>
+</div>
+<table>
+    <tr>
+        <td width="65%">
+            <h3>To :</h3>
+            <blockquote>
+                <p>
+                    <strong>
+                        @Html.DisplayFor(model => model.Customer.Name)
+                    </strong>
+                </p>
+                <p>
+                    Company Number:
+                    <strong>
+                        @Html.DisplayFor(model => model.Customer.CompanyNumber)
+                    </strong>
+                </p>
+                <p>
+                    @Html.DisplayFor(model => model.Customer.Address)
+                </p>
+                <p>
+                    @Html.DisplayFor(model => model.Customer.CP),
+                    @Html.DisplayFor(model => model.Customer.City)
+                </p>
+            </blockquote>
+        </td>
+        <td>
+            <h3>Note :</h3>
+            @Html.Raw(Model.Notes.Replace(Environment.NewLine, "<br/>"))
+        </td>
+    </tr>
+</table>
+
+
+<table class="zebra-striped">
+    <thead>
+        <th>
+          Article
+        </th>
+        <th width="40">
+          Qty
+        </th>
+        <th width="75">
+          Price
+        </th>
+        <th width="80">
+          SubTotal
+        </th>
+        <th width="80">
+          VAT
+        </th>
+        <th width="100">
+          Total
+        </th>
+        @if (ViewBag.Print != true)
+        {
+            <th width="100"></th>
+        }
+    </thead>
+
+    @foreach (var item in Model.InvoiceDetails)
+    {
+        var invoiceDetail = "invoiceDetail" + item.InvoiceDetailsId;
+        <tr id="@invoiceDetail">
+            <td>
+                @Html.DisplayFor(modelItem => item.Article.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Qty)
+            </td>
+            <td>
+                @String.Format("{0:C}", item.Price)
+            </td>
+
+            <td>
+                @String.Format("{0:C}", item.Total)
+            </td>
+            <td>
+                @String.Format("{0:C}", item.VatAmount)
+            </td>
+            <td>
+                @String.Format("{0:C}", item.TotalPlusVat)
+            </td>
+        </tr>
+    }
+    <tfoot>
+        <tr>
+            <td class="invoiceFooterTitle">Sub Total:</td>
+            <td>@Model.InvoiceDetails.Sum(i => i.Qty)</td>
+            <td>-</td>
+            <td>@String.Format("{0:C}", Model.NetTotal)</td>
+            <td>@String.Format("{0:C}", Model.VATAmount)</td>
+            <td>@String.Format("{0:C}", Model.TotalWithVAT)</td>
+
+        </tr>
+    </tfoot>
+</table>
+<table>
+    <tr>
+        <td colspan="5" class="invoiceFooterTitle">Sub Totak:</td>
+        <td width="200" class="invoiceFooterValue">@String.Format("{0:C}", Model.NetTotal)</td>
+    </tr>
+    <tr>
+        <td colspan="5" class="invoiceFooterTitle">VAT:</td>
+        <td width="200" class="invoiceFooterValue">@String.Format("{0:C}", Model.VATAmount)</td>
+    </tr>
+    @if (Model.AdvancePaymentTaxAmount > 0)
+    {
+        <tr>
+            <td colspan="5" class="invoiceFooterTitle">Advance Payment Tax (*):</td>
+            <td class="invoiceFooterValue">- @String.Format("{0:C}", Model.AdvancePaymentTaxAmount)</td>
+        </tr>
+    }
+    <tr>
+        <td colspan="5" class="invoiceFooterTitle">Total to Pay: </td>
+        <td class="invoiceFooterValueTotal">@String.Format("{0:C}", Model.TotalToPay)</td>
+    </tr>
+</table>
+<div class="invoiceFooter">
+    <p>
+        (*) @string.Format("To be paid to the Tax agency in behalf of {0}", ViewBag.MyCompany)
+    </p>
+    <p>
+        <strong>Payment details</strong>:
+        Bank wire : @ViewBag.MyBankAccount
+    </p>
+
+</div>

@@ -1,0 +1,89 @@
+@model Customer
+
+@{
+    ViewData["Title"] = "Customer Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<ul class="breadcrumb">
+    <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+    <li><a asp-controller="Customers" asp-action="Index">Customers</a></li>
+    <li class="active">Details</li>
+</ul>
+
+
+<div>
+    <hr />
+    <h3>@(Model.Name) Details</h3>
+    <dl class="dl-horizontal spaced-lines">
+        <dt>
+            @Html.DisplayNameFor(model => model.CompanyNumber)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CompanyNumber)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Address)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Address)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CP)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CP)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.City)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.City)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ContactPerson)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ContactPerson)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Fax)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Fax)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Notes)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Notes)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Phone1)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Phone1)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Phone2)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Phone2)
+        </dd>
+    </dl>
+</div>
+<p>
+    <a asp-action="Edit" asp-route-id="@Model.CustomerId" class="k-button k-primary btn btn-default">Edit</a>
+    <a asp-action="Index" class="btn btn-default k-button">Back to List</a>
+</p>

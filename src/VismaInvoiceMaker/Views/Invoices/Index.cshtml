@@ -1,0 +1,72 @@
+@using Kendo.Mvc.UI
+@model List<Invoice>
+@{
+    ViewData["Title"] = "Invoices";
+}
+
+<ul class="breadcrumb">
+    <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+    <li class="active">My Invoices</li>
+</ul>
+
+<div class="invoice-header">
+    @(Html.Kendo().Button()
+          .Name("NewInvoiceBtn")
+          .HtmlAttributes(new { type = "button", @class = "k-primary left-align margin-right" })
+          .Content("New Invoice")
+          .Events(e => e
+              .Click("newInvoice")))
+</div>
+
+<div class="invoice-content margin-top">
+    @(Html.Kendo().Grid<Invoice>()
+          .Name("gridInvoices")
+          .Columns(columns =>
+          {
+              columns.Bound(c => c.InvoiceNumber).Title("#").Filterable(false);
+              columns.Bound(c => c.InvoiceState).Title("Status").Filterable(c => c.CheckAll(true).Multi(true));
+              columns.Bound(c => c.Customer.Name).Title("Customer");
+              columns.Bound(c => c.TimeStamp).Format("{0:dd/MM/yyyy}").Width(100);
+              columns.Bound(c => c.VATAmount).Width(50).Format("{0:n2} NOK").Title("VAT Amount").HtmlAttributes(new { style = "text-align: right;" }).FooterHtmlAttributes(new { style = "text-align: right;" }).ClientFooterTemplate("#=kendo.toString(sum,'n2')# NOK");
+              columns.Bound(c => c.TotalWithVAT).Width(50).Format("{0:n2} NOK").Title("Total with VAT").HtmlAttributes(new { style = "text-align: right;" }).FooterHtmlAttributes(new { style = "text-align: right;" }).ClientFooterTemplate("#=kendo.toString(sum,'n2')# NOK");
+              columns.Command(command =>
+              {
+                  command.Custom("editItem").Text("Edit").Click("editInvoice");
+                  command.Custom("print").Text("Print").Click("printFromGrid");
+                  command.Custom("release").Text("Release").Click("releaseInvoice");
+                  command.Destroy();
+              }).Title("Actions").Width(330);
+          })
+          .Resizable(c => c.Columns(true))
+          .Selectable(s => s.Enabled(true).Mode(GridSelectionMode.Single))
+          .Sortable(true)
+          .Filterable(f => f.Enabled(true).Mode(GridFilterMode.Menu))
+          .Groupable(false)
+          .Pageable(p => p.Enabled(true).PageSizes(true).Refresh(true))
+          .Events(e =>
+          {
+               e.DataBound("onDataBoundGridTemplate");
+             //  e.Change("onClickGridInvoices");
+          })
+          .DataSource(dataSource => dataSource
+              .Custom().PageSize(10)
+              .Schema(s => s.Model(m =>
+              {
+                  m.Id(i => i.InvoiceId);
+              })).Aggregates(a =>
+              {
+                  a.Add(t => t.VATAmount).Sum();
+                  a.Add(t => t.TotalWithVAT).Sum();
+              })
+              .Transport(t => t
+                  .ParameterMap("parameterWrapFunction")
+                  .Read(r => r
+                      .Action("GetInvoices", "Invoices").DataType("json"))
+                  .Destroy(r => r
+                      .Action("DeleteInvoice", "Invoices").DataType("json")))
+          ))
+</div>
+    
+<script>
+    $("#InvoicesMenuLink").addClass("k-state-selected");
+</script>

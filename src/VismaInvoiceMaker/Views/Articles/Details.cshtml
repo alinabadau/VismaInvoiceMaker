@@ -1,0 +1,45 @@
+@model Article
+
+@{
+    ViewData["Title"] = "Supply Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<ul class="breadcrumb">
+    <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+    <li><a asp-controller="Articles" asp-action="Index">My Supplies</a></li>
+    <li class="active">Details</li>
+</ul>
+
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Notes)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Notes)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Price)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Price)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.VAT)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.VAT)
+        </dd>
+    </dl>
+</div>
+<p>
+    <a asp-action="Edit" asp-route-id="@Model.ArticleId" class="btn btn-default k-primary k-button">Edit</a>
+    <a asp-action="Index" class="btn btn-default k-button">Back to List</a>
+</p>

@@ -1,0 +1,65 @@
+@using System.Threading.Tasks
+@using Kendo.Mvc.UI
+@model IEnumerable<Store>
+
+@{
+    ViewData["Title"] = "Stores";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<ul class="breadcrumb">
+    <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+    <li class="active">Stores</li>
+</ul>
+
+<p>
+    @(Html.ActionLink("Add New", "Create", "Stores", htmlAttributes: new { @class = "k-primary k-button btn btn-primary" }))
+</p>
+
+@(Html.Kendo().Grid<Store>()
+              .Name("gridStores")
+              .Columns(columns =>
+              {
+                  columns.Bound(c => c.Name).Title("Name").Filterable(c => c.CheckAll(true).Multi(true));
+                  columns.Bound(c => c.Phone1).Title("Phone").Filterable(false);
+                  columns.Bound(c => c.Email).Width(100).Filterable(false);
+                  columns.Bound(c => c.ContactPerson).Width(150).Filterable(false);
+                  columns.Bound(c => c.City).Width(100).Filterable(c => c.CheckAll(true).Multi(true));
+                  columns.Command(command =>
+                  {
+                      command.Custom("editItem").Text("Edit").Click("function(e){ actionOnRowItem(e, '#gridStores', 'StoreId', '" + Url.Action("Edit", "Stores") + "');}");
+                      command.Custom("viewItem").Text("Details").Click("function(e){ actionOnRowItem(e, '#gridStores', 'StoreId', '" + Url.Action("Details", "Stores") + "');}");
+                      command.Custom("deleteItem").Text("Delete").Click("function(e){ actionOnRowItem(e, '#gridStores', 'StoreId', '" + Url.Action("Delete", "Stores") + "');}");
+                  }).Title("Actions").Width(250);
+              })
+              .Resizable(c => c.Columns(true))
+              .Selectable(s => s.Enabled(true).Mode(GridSelectionMode.Single))
+              .Sortable(true)
+              .Filterable(f => f.Enabled(true).Mode(GridFilterMode.Menu))
+              .Groupable(false)
+              .Pageable(p => p.Enabled(true).PageSizes(true))
+              .Events(e => e.DataBound("onDataBoundGridTemplate"))
+              .BindTo(Model.ToList())
+              .DataSource(dataSource => dataSource
+              .Ajax()
+              .PageSize(10)
+              .Batch(true)
+              .ServerOperation(false)
+              .Events(events => events.Error("error_handler"))
+              .Model(model =>
+              {
+                  model.Id(p => p.StoreId);
+                  model.Field(f => f.Name);
+                  model.Field(f => f.Address);
+                  model.Field(f => f.City);
+                  model.Field(f => f.ContactPerson);
+                  model.Field(f => f.Email);
+                  model.Field(f => f.Phone1);
+              })))
+
+
+
+
+<script>
+    $("#menu").find("li").removeClass("k-state-selected");
+    $("#StoreMenuLink").addClass("k-state-selected");
+</script>
